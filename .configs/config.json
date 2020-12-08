@@ -1,0 +1,6 @@
+{
+	"exchange_rates": {
+		"app_id": "ea23917764e3479a9e839e5801da62a8",
+		"url": "https://openexchangerates.org/api/latest.json"
+	}
+}

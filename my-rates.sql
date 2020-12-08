@@ -307,4 +307,3 @@ ALTER TABLE ONLY public.prices
 --
 -- PostgreSQL database dump complete
 --
-
