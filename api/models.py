@@ -35,8 +35,16 @@ class Prices(models.Model):
     day         = models.DateField(blank=True, null=True)
     price       = models.IntegerField(blank=True, null=True, default=0)
     customer    = models.ForeignKey(Customers, on_delete=models.CASCADE)
-    orig_code   = models.ForeignKey(Ports, on_delete=models.CASCADE, related_name='orig_code',null=True)
-    dest_code   = models.ForeignKey(Ports, on_delete=models.CASCADE, related_name='dest_code', null=True)
+    orig_code   = models.ForeignKey(
+                        Ports,
+                        on_delete=models.CASCADE,
+                        related_name='orig_code',null=True
+                        )
+    dest_code   = models.ForeignKey(
+                        Ports,
+                        on_delete=models.CASCADE,
+                        related_name='dest_code', null=True
+                        )
 
     def __str__(self):
         return str(self.dest_code)

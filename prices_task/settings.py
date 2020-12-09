@@ -13,7 +13,7 @@ SECRET_KEY = '!%=w3ii0+#k7u*(b&7t53qgr24@(h8iq@5#dry-ieqo-%hrkq&'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 # Allowed hosts
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -94,6 +94,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+# set to True if using https SSL redirects
+# SECURE_SSL_REDIRECT = False
+# SECURE_HSTS_SECONDS = 0
+
+X_FRAME_OPTIONS = 'DENY'
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'

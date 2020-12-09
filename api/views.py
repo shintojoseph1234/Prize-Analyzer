@@ -1,5 +1,7 @@
+"""
+Views for Api app
+"""
 # Django imports
-from django.shortcuts import render
 from django.db.models import Func, F, Avg, FloatField
 from django.db.models.functions import Cast, Round
 # REST imports
@@ -9,7 +11,6 @@ from rest_framework.decorators import api_view
 from rest_framework.generics import GenericAPIView
 # local imports
 from api.models import (
-    Customers,
     Prices,
     Ports,
 )
@@ -18,7 +19,6 @@ from api.serializers import (
     ComparePricesSerializer
 )
 from api.utils import (
-    get_error_message,
     exchange_rates,
     custom_sql,
     get_model_obj,
@@ -50,11 +50,12 @@ def my_prices(request, day, customer):
     # if serialiser not valid
     if not serializer.is_valid():
         # return error message
-        return get_error_message("DATA_ERROR", str(serializer.errors))
-    else:
-        day         = serializer.data['day']
-        customer    = serializer.data['customer']
+        content = {'message': str(serializer.errors)}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
+    # get the input data
+    day         = serializer.data['day']
+    customer    = serializer.data['customer']
     # filter by day
     day_prices_obj = Prices.objects.filter(day=day)
     # filter by customer
@@ -63,21 +64,24 @@ def my_prices(request, day, customer):
     average_price = day_prices_obj.filter(
         orig_code__in=customer_prices_obj.values_list('orig_code', flat=True),
         dest_code__in=customer_prices_obj.values_list('dest_code', flat=True)
-    ).aggregate(average_price=Round(Avg('price'))).get('average_price', 0.00)
+        ).aggregate(
+            average_price=Round(Avg('price'))
+            ).get('average_price', 0.00)
+
     # find the absoluteand percent difference
     diff_obj_list = customer_prices_obj.annotate(
         absolute_diff=Cast(
-            Func(F('price') - average_price, function='ABS'), FloatField()
+        Func(F('price') - average_price, function='ABS'), FloatField()
         ),
-    ).annotate(
-        percent_diff=(F('absolute_diff')/average_price) * 100,
-    ).values(
-        'absolute_diff',
-        'percent_diff',
-        'price',
-        origin_code=F('orig_code__code'),
-        destination_code=F('dest_code__code'),
-    )
+        ).annotate(
+            percent_diff=(F('absolute_diff')/average_price) * 100,
+            ).values(
+            'absolute_diff',
+            'percent_diff',
+            'price',
+            origin_code=F('orig_code__code'),
+            destination_code=F('dest_code__code'),
+            )
 
     # insert avarage price in result_set
     result_set = [{**each, 'average': average_price}  for each in diff_obj_list]
@@ -112,24 +116,22 @@ class ComparePriceViewSet(GenericAPIView):
     serializer_class = ComparePricesSerializer
 
     def post(self, request, *args, **kwargs):
-
         # obtain the data
         data = request.data
         # check data with serializer
         serializer = ComparePricesSerializer(data=data)
-
         # if serialiser not valid
         if not serializer.is_valid():
             # return error message
-            return get_error_message("DATA_ERROR", str(serializer.errors))
-        else:
-            # inputs from API
-            day                 = serializer.data['day']
-            price               = serializer.data['price']
-            currency            = serializer.data['currency']
-            origin_code         = serializer.data['origin_code']
-            destination_code    = serializer.data['destination_code']
+            content = {'message': str(serializer.errors)}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
+        # get the input data
+        day                 = serializer.data['day']
+        price               = serializer.data['price']
+        currency            = serializer.data['currency']
+        origin_code         = serializer.data['origin_code']
+        destination_code    = serializer.data['destination_code']
         # convert price into USD
         price = exchange_rates(price, currency)
         # get the port obj for the port code
@@ -147,9 +149,9 @@ class ComparePriceViewSet(GenericAPIView):
             prices_obj.day = day
             prices_obj.price = price
             prices_obj.save()
-        except:
+        except Exception as error:
             # response messages
-            content = {'message': 'Failed to save data'}
+            content = {'message': 'Error %s' % (error)}
             return Response(content, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         # sql queryt to find average
