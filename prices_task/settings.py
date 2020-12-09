@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     # custom apps
     'api',
     'rest_framework',
+    'rest_framework_swagger'
 ]
 
 MIDDLEWARE = [
@@ -62,7 +63,8 @@ WSGI_APPLICATION = 'prices_task.wsgi.application'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.AllowAny'],
-    'TEST_REQUEST_DEFAULT_FORMAT': 'json'
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
 # postgress database
@@ -117,3 +119,7 @@ config_file.close()
 # Configuration of exchange rate API
 EXCHANGE_RATES_URL  = config_data['exchange_rates']['url']
 EXCHANGE_APP_ID     = config_data['exchange_rates']['app_id']
+
+SWAGGER_SETTINGS = {
+    'DOC_EXPANSION': 'list',
+}
