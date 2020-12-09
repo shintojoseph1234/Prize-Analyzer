@@ -146,7 +146,7 @@ class ComparePriceViewSet(GenericAPIView):
             prices_obj.dest_code = dest_code_obj
             prices_obj.day = day
             prices_obj.price = price
-            # prices_obj.save()
+            prices_obj.save()
         except:
             # response messages
             content = {'message': 'Failed to save data'}
