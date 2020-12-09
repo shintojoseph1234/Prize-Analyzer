@@ -132,14 +132,20 @@ class ComparePriceViewSet(GenericAPIView):
         currency            = serializer.data['currency']
         origin_code         = serializer.data['origin_code']
         destination_code    = serializer.data['destination_code']
-        # convert price into USD
-        price = exchange_rates(price, currency)
+
         # get the port obj for the port code
         orig_port_obj = get_model_obj(Ports, code=origin_code)
         dest_code_obj = get_model_obj(Ports, code=destination_code)
 
         if not (orig_port_obj or dest_code_obj):
             content = {'message': 'origin_code/dest_code_obj not found in Ports list'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # convert price into USD
+            price = exchange_rates(price, currency)
+        except Exception as error:
+            content = {'message': 'currency code cannot be found'}
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
         try:
