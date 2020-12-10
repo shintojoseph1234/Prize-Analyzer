@@ -40,7 +40,9 @@ Open  [localhost:8000/api/schema](http://localhost:8000/api/schema/)  in a brows
 
 ## My-prices API
 API endpoint that takes the following parameters:
+
 day
+
 customer
 
 Returns a list with the prices that given customer has on the given day, compared against average price across all customers for the same orig/dest combo on the same day. Comparison should include absolute difference of customer price versus average, as well as percentage difference.
@@ -75,10 +77,15 @@ curl -X GET -H 'Content-Type: application/json'  http://localhost:8000/api/my-pr
 
 ### Compare-Price API
 API endpoint where you can upload a price, including the following parameters:
+
 day
+
 origin_code
+
 destination_code
+
 price
+
 currency
 
 API endpoint should compare uploaded price against average price for the same orig/dest combo on the same day. Response should include absolute difference of the uploaded price versus average, as well as percentage difference.
@@ -121,7 +128,7 @@ curl -X POST -d '''{"day": "2016-01-01", "origin_code": "CNSGH","destination_cod
     ```
 
     ii) We will set a limit for the number of input fields according to the limitations.
-		
+
     iii) At the backend we will handle multiple requests by creating asynchronous background jobs (Celery + RabbitMQ) to do the work, and return the respective job ID.
     This endpoint returns a job_status JSON object.
     Use the Show Job Status endpoint to check for the job's completion.
