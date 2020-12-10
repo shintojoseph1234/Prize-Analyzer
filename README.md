@@ -106,6 +106,7 @@ curl -X POST -d '''{"day": "2016-01-01", "origin_code": "CNSGH","destination_cod
 3. Therefore, it's usually better to make fewer requests with more data (e.g. upload multiple price points) as opposed to making more requests with fewer data (e.g.upload single price point) in each request.
 
 4. Google Drives batch processing API request format (https://developers.google.com/drive/api/v3/batch), is very flexible but it's more complicated to set up a POST API in this format, moreover, we have,
+
     i) Only one POST API to be handled in this scenario.
     ii) The input data structure for each POST request is the same.
 
