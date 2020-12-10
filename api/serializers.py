@@ -3,6 +3,7 @@ Serializers defined for Api app
 """
 # REST imports
 from rest_framework import serializers
+# local imports
 from api.models import Prices, Ports
 from api.utils import get_model_obj, exchange_rates
 
