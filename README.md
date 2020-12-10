@@ -34,7 +34,6 @@ Open  [localhost:8000](http://localhost:8000/)  in a browser to see the Swagger 
 
 Open  [localhost:8000/api](http://localhost:8000/api/)  in a browser to see the available API
 
-Open  [localhost:8000/api/schema](http://localhost:8000/api/schema/)  in a browser to see the schema of all API
 
 ## GET API
 
