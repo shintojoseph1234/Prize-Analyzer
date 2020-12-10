@@ -46,16 +46,12 @@ def my_prices(request, day, customer):
     data = {"day":day, "customer":customer}
     # serializer
     serializer = MyPricesSerializer(data=data)
-
     # if serialiser not valid
     if not serializer.is_valid():
         # return error message
         content = {'message': str(serializer.errors)}
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
-    # get the input data
-    day         = serializer.data['day']
-    customer    = serializer.data['customer']
     # filter by day
     day_prices_obj = Prices.objects.filter(day=day)
     # filter by customer
@@ -120,46 +116,27 @@ class ComparePriceViewSet(GenericAPIView):
         data = request.data
         # check data with serializer
         serializer = ComparePricesSerializer(data=data)
-        # if serialiser not valid
-        if not serializer.is_valid():
+
+        if serializer.is_valid():
+            # save data into model
+            serializer.save()
+        else:
             # return error message
             content = {'message': str(serializer.errors)}
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
         # get the input data
-        day                 = serializer.data['day']
-        price               = serializer.data['price']
-        currency            = serializer.data['currency']
-        origin_code         = serializer.data['origin_code']
-        destination_code    = serializer.data['destination_code']
+        day                 = data['day']
+        price               = data['price']
+        currency            = data['currency']
+        origin_code         = data['origin_code']
+        destination_code    = data['destination_code']
 
         # get the port obj for the port code
         orig_port_obj = get_model_obj(Ports, code=origin_code)
         dest_code_obj = get_model_obj(Ports, code=destination_code)
-
-        if not (orig_port_obj or dest_code_obj):
-            content = {'message': 'origin_code/dest_code_obj not found in Ports list'}
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            # convert price into USD
-            price = exchange_rates(price, currency)
-        except Exception as error:
-            content = {'message': 'currency code cannot be found'}
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            prices_obj = Prices()
-            prices_obj.orig_code = orig_port_obj
-            prices_obj.dest_code = dest_code_obj
-            prices_obj.day = day
-            prices_obj.price = price
-            prices_obj.save()
-        except Exception as error:
-            # response messages
-            content = {'message': 'Error %s' % (error)}
-            return Response(content, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-
+        # convert price into USD
+        price = exchange_rates(price, currency)
         # sql queryt to find average
         avg_sql_query = """
                     SELECT AVG(prices.price)
@@ -178,11 +155,7 @@ class ComparePriceViewSet(GenericAPIView):
         row = custom_sql(avg_sql_query, sql_inputs)
         # average price
         average_price = row[0]
-        # initialize absolute_diff variable
-        absolute_diff = None
-        # initialize percent_diff variable
-        percent_diff = None
-        # if average price not none
+        # if average price not None
         if average_price:
             # extract the average from tuple
             average_price = float(row[0])
@@ -190,6 +163,11 @@ class ComparePriceViewSet(GenericAPIView):
             absolute_diff = abs(price - average_price)
             # find percent difference
             percent_diff = (absolute_diff/average_price) * 100
+        else:
+            # initialize absolute_diff variable
+            absolute_diff = None
+            # initialize percent_diff variable
+            percent_diff = None
 
         # response
         success = [{

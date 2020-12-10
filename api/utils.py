@@ -66,6 +66,6 @@ def exchange_rates(price, currency_code):
     # USD rate of corresponding currency
     usd_rate = data['rates'][currency_code.upper()]
     # convert price into USD
-    usd_price = price/usd_rate
+    usd_price = float(price)/usd_rate
     # return usd_price
     return usd_price
