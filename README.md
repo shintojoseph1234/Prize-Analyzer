@@ -108,6 +108,7 @@ curl -X POST -d '''{"day": "2016-01-01", "origin_code": "CNSGH","destination_cod
 4. Google Drives batch processing API request format (https://developers.google.com/drive/api/v3/batch), is very flexible but it's more complicated to set up a POST API in this format, moreover, we have,
 
     i) Only one POST API to be handled in this scenario.
+
     ii) The input data structure for each POST request is the same.
 
 5. Considering the above factors we will create an API similar to the approach chosen by ZenDesk (https://developer.zendesk.com/rest_api/docs/support/users#create-or-update-many-users),
@@ -120,6 +121,7 @@ curl -X POST -d '''{"day": "2016-01-01", "origin_code": "CNSGH","destination_cod
     ```
 
     ii) We will set a limit for the number of input fields according to the limitations.
+		
     iii) At the backend we will handle multiple requests by creating asynchronous background jobs (Celery + RabbitMQ) to do the work, and return the respective job ID.
     This endpoint returns a job_status JSON object.
     Use the Show Job Status endpoint to check for the job's completion.
@@ -137,7 +139,7 @@ curl -X POST -d '''{"day": "2016-01-01", "origin_code": "CNSGH","destination_cod
      	}]
      }]
      ```
-     v) We will create another GET API which accepts job_statuses id
+     iv) We will create another GET API which accepts job_statuses id
      and returns back the job status. We can also write GET API in a way such that it accepts multiple job_statuses ids and return backs the results
      as this will be helpful if we are setting a limit for inputs in the POST API.
      The "results" array in a response lists the resources that were successfully and unsuccessfully uploaded.
