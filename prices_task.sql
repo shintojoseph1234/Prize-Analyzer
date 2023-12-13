@@ -1,5 +1,5 @@
 --
--- PostgreSQL database dump
+-- PostgreSQL database
 --
 
 -- Dumped from database version 12.5 (Debian 12.5-1.pgdg100+1)

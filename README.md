@@ -1,4 +1,4 @@
-# Prices API
+# Price Analyzer
 
 Prices API is an HTTP-based API capable of returning average prices, absolute difference, percentage difference for each day on a route between Port Codes origin and destination
 
@@ -101,53 +101,3 @@ curl -X POST -d '''{"day": "2016-01-01", "origin_code": "CNSGH","destination_cod
 	}
 }]
 ```
-
-## Batch processing
-###### For Batch processing, we will examine the below factors,
-
-1. Networking or the number of calls we need to make, is often the bottleneck when batch processing.
-
-2. Adoption of public clouds such as AWS has made it easy to scale up the processing power, RAM, or storage of our applications, but each networking call still needs to negotiate a complicated and unreliable global network of computers, routers, switches, and protocols, such as TCP, adding a lot of overhead for each call.
-
-3. Therefore, it's usually better to make fewer requests with more data (e.g. upload multiple price points) as opposed to making more requests with fewer data (e.g.upload single price point) in each request.
-
-4. Google Drives batch processing API request format (https://developers.google.com/drive/api/v3/batch), is very flexible but it's more complicated to set up a POST API in this format, moreover, we have,
-
-    i) Only one POST API to be handled in this scenario.
-
-    ii) The input data structure for each POST request is the same.
-
-5. Considering the above factors we will create an API similar to the approach chosen by ZenDesk (https://developer.zendesk.com/rest_api/docs/support/users#create-or-update-many-users),
-
-     i) We will create an POST API endpoint where it will accept an array of inputs instead of a single input,
-
-     ```bash
-     [{"day": "2016-01-01","origin_code": "CNSGH","destination_code": "NLRTM","price": 645,"currency": "USD"},
-    {"day": "2016-01-02","origin_code": "CNSGH","destination_code": "NLRTM","price": 593,"currency": "USD"}]
-    ```
-
-    ii) We will set a limit for the number of input fields according to the limitations.
-
-    iii) At the backend we will handle multiple requests by creating asynchronous background jobs (Celery + RabbitMQ) to do the work, and return the respective job ID.
-    This endpoint returns a job_status JSON object.
-    Use the Show Job Status endpoint to check for the job's completion.
-
-     ```bash
-    curl -X POST -d '''[{"day": "2016-01-01","origin_code": "CNSGH","destination_code": "NLRTM","price": 645,"currency": "USD"}, {"day": "2016-01-02","origin_code": "CNSGH","destination_code": "NLRTM","price": 593,"currency": "USD"}]''' -H "Content-Type: application/json" http://127.0.0.1:8000/api/compare-price/
-    [{
-     	"job_statuses": [{
-     		"id": "8b726e606741012ffc2d782bcb7848ff",
-     		"status": "queued",
-     		"total": 2,
-     		"progress": '10%',
-     		"message": 'started',
-     		"results": null
-     	}]
-     }]
-     ```
-     iv) We will create another GET API which accepts job_statuses id
-     and returns back the job status. We can also write GET API in a way such that it accepts multiple job_statuses ids and return backs the results
-     as this will be helpful if we are setting a limit for inputs in the POST API.
-     The "results" array in a response lists the resources that were successfully and unsuccessfully uploaded.
-
-6. The advantage of this approach is that it is simple to use. If users of our API know how to create a single resource, they can easily modify their existing code to pass through an array, instead of a single resource.
