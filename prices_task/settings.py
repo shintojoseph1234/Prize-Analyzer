@@ -73,10 +73,13 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': 'xeneta-my-rates',
-        'HOST': '0.0.0.0',
+        'PASSWORD': 'prices_task',
+        #'PASSWORD': 'xeneta-my-rates',
+	#'HOST': '0.0.0.0',
+        'HOST': '127.0.0.1',
         #'HOST': '10.0.142.142',
-        'PORT': '5432',
+        #'PORT': '5432',
+        'PORT': '5433',
     }
 }
 
@@ -148,3 +151,23 @@ SWAGGER_SETTINGS = {
 
 # below line have to be the last line of the file
 #urlpatterns += staticfiles_urlpatterns()
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/home/ubuntu/prices_task/error.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
