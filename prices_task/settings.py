@@ -13,8 +13,9 @@ SECRET_KEY = '!%=w3ii0+#k7u*(b&7t53qgr24@(h8iq@5#dry-ieqo-%hrkq&'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 # Allowed hosts
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
+#ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
+#ALLOWED_HOSTS = ['']
 
 # Application definition
 INSTALLED_APPS = [
@@ -74,6 +75,7 @@ DATABASES = {
         'USER': 'postgres',
         'PASSWORD': 'xeneta-my-rates',
         'HOST': '0.0.0.0',
+        #'HOST': '10.0.142.142',
         'PORT': '5432',
     }
 }
@@ -117,6 +119,11 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
+import os
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+#STATICFILES_DIRS = [
+#    os.path.join(BASE_DIR,'static') 
+#]
 
 # config file path
 CONFIGURATION_FILE = os.path.join(BASE_DIR, '.configs/config.json')
@@ -134,3 +141,10 @@ EXCHANGE_APP_ID     = config_data['exchange_rates']['app_id']
 SWAGGER_SETTINGS = {
     'DOC_EXPANSION': 'list',
 }
+
+
+# import the staticfiles_urlpatterns
+#from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
+# below line have to be the last line of the file
+#urlpatterns += staticfiles_urlpatterns()
